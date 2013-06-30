@@ -1,5 +1,6 @@
 var Emitter = require('emitter')
   , domify  = require('domify')
+  , classes = require('classes')
 
 module.exports = MultiView;
 
@@ -8,6 +9,7 @@ function MultiView(el){
   this.rootEl = (typeof el == 'string' ? document.querySelector(el) : el);
   this.views = {};
   this.templates = {};
+  this.transitionedClass = null;
   return this;
 }
 
@@ -16,6 +18,11 @@ MultiView.prototype = new Emitter;
 MultiView.prototype.mode = function(name,tmpl,view){
   this.templates[name] = tmpl;
   this.views[name] = view;
+  return this;
+}
+
+MultiView.prototype.transitioned = function(className){
+  this.transitionedClass = className;
   return this;
 }
 
@@ -30,6 +37,7 @@ MultiView.prototype.render = function(model,mode){
   this.bindTransitions();
   if (lastEl) { this.rootEl.replaceChild(this.el, lastEl) }
   else        { this.rootEl.appendChild(this.el)  }
+  domTransition(this.el, this.transitionedClass);
   this.emit('change', lastMode, mode);
   this.emit(mode, lastMode);
   return this;
@@ -49,8 +57,13 @@ MultiView.prototype.bindTransitions = function(){
   });
 }
 
-
 // private
+
+function domTransition(el,className){
+  if (!className) return;
+  el.clientHeight; // force reflow
+  classes(el).add(className);
+}
 
 function each(obj,fn){
   var has = Object.prototype.hasOwnProperty;

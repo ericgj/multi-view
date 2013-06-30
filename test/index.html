@@ -16,6 +16,18 @@
         min-height: 1000px;
       }
 
+      .edit, .read {
+        -webkit-transition: opacity 0.3s ease-in;
+        -moz-transition: opacity 0.3s ease-in;
+        -ms-transition: opacity 0.3s ease-in;
+        transition: opacity 0.3s ease-in;
+        opacity: 0;
+      }
+
+      .edit.trans, .read.trans {
+        opacity: 1;
+      }
+
       .edit input {
         margin: 0 1em 1em 0;
         display: inline-block;
@@ -124,7 +136,7 @@
        , multi = MultiView('#example1')
                    .mode('view', readTmpl, ReadView)
                    .mode('edit', editTmpl, EditView)
-
+                   .transitioned('trans');
 
      var m = Model()
 
