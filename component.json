@@ -1,0 +1,19 @@
+{
+  "name": "multi-view",
+  "repo": "ericgj/multi-view",
+  "description": "Multiple-state views controller",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "component/emitter": "*",
+    "component/domify": "*"
+  },
+  "development": {
+    "component/reactive": "*"  
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}

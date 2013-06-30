@@ -1,0 +1,61 @@
+var Emitter = require('emitter')
+  , domify  = require('domify')
+
+module.exports = MultiView;
+
+function MultiView(el){
+  if (!(this instanceof MultiView)) return new MultiView(el);
+  this.rootEl = (typeof el == 'string' ? document.querySelector(el) : el);
+  this.views = {};
+  this.templates = {};
+  return this;
+}
+
+MultiView.prototype = new Emitter;
+
+MultiView.prototype.mode = function(name,tmpl,view){
+  this.templates[name] = tmpl;
+  this.views[name] = view;
+  return this;
+}
+
+MultiView.prototype.render = function(model,mode){
+  if (this.mode == mode && this.model === model) return this;
+  var lastMode = this.mode
+    , lastEl   = this.el
+  this.model = model;
+  this.mode = mode;
+  this.view = new this.views[mode](domify(this.templates[mode]),model);
+  this.el = this.view.el;
+  this.bindTransitions();
+  if (lastEl) { this.rootEl.replaceChild(this.el, lastEl) }
+  else        { this.rootEl.appendChild(this.el)  }
+  this.emit('change', lastMode, mode);
+  this.emit(mode, lastMode);
+  return this;
+}
+
+/* Catch any view event signalling mode transition, and perform transition
+   so it makes it easy for the views to trigger transitions
+*/
+MultiView.prototype.bindTransitions = function(){
+  if (!this.view.on) return;
+  var self = this;
+  each(this.views, function(mode){
+    if (mode == self.mode) return;
+    self.view.on(mode, function(){
+      self.render(self.model,mode);
+    });
+  });
+}
+
+
+// private
+
+function each(obj,fn){
+  var has = Object.prototype.hasOwnProperty;
+  for (var key in obj){
+    if (has.call(obj,key)) fn(key, obj[key]);
+  }
+}
+

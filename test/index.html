@@ -1,0 +1,137 @@
+<!DOCTYPE 5>
+<html>
+  <head>
+    <title>Multi View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      
+      p {
+        -webkit-margin-before: 0;
+        -webkit-margin-after: 0;
+      }
+
+      body {
+        padding: 60px;
+        font: 300 14px "Helvetica Neue", Helvetica, Arial;
+        min-height: 1000px;
+      }
+
+      .edit input {
+        margin: 0 1em 1em 0;
+        display: inline-block;
+      }
+
+      .edit input[type=text] {
+        width: 200px;
+      } 
+
+      .read p {
+        width: 200px;
+        margin: 0 1em 1em 0;
+        display: inline-block;
+      }
+
+    </style>
+  </head>
+  <body>
+   <h1>Multi View</h1>
+   <h2>1. A simple example</h2>
+   <div id="example1"></div>
+
+   <script src="../build/build.js"></script>
+
+   <script id="example1-read" type="text/plain">
+     <div class="read">
+       <p>{name || "N/A"}</p>
+       <button on-click="edit">Edit</button>
+     </div>
+   </script>
+   
+   <script id="example1-edit" type="text/plain">
+     <form class="edit">
+       <input type="text" name="name" placeholder="Enter name" data-value="name" />
+       <input type="submit" on-click="save" value="Save" />
+       <input type="submit" on-click="cancel" value="Cancel" />
+     </form>
+   </script>
+   
+   <script>
+      var MultiView = require('multi-view')
+        , Emitter = require('component-emitter')
+        , reactive = require('component-reactive')
+
+      function Model(name){
+        if (!(this instanceof Model)) return new Model(name);
+        this.name = name;
+        return Emitter(this);
+      }
+      Model.prototype.save = function(){
+        console.log('saving %s...', this.name);
+      }
+
+     /* example 1 */
+
+     function ReadView(el,model){
+       this.model = model;
+       this.el = el;
+       this.view = reactive(el,model,this);
+       return Emitter(this);
+     }
+
+     ReadView.prototype.edit = function(){
+       this.emit('edit');
+     }
+
+     function EditView(el,model){
+       this.model = model;
+       this.el = el;
+       this.view = reactive(el,model,this);
+       return Emitter(this);
+     }
+
+     EditView.prototype.name = function(){
+       return this.model.name || ''
+     }
+
+     EditView.prototype.save = function(e){
+       e.preventDefault();
+       this.updateAll();
+       this.model.save();
+       this.emit('view');
+     }
+
+     EditView.prototype.cancel = function(e){
+       e.preventDefault();
+       this.emit('view');
+     }
+
+     EditView.prototype.update = function(e){
+       var el = e.target, name = el.name
+       this.model[name] = (el.value || null);
+     }
+      
+     EditView.prototype.updateAll = function(){
+       var inputs = this.el.querySelectorAll('input');
+       for (var i=0;i<inputs.length;++i){
+         var input = inputs[i]
+         if (input.type == 'submit') continue;
+         this.update({target: input});
+       }
+     }
+
+     var readTmpl = document.getElementById("example1-read").innerHTML
+       , editTmpl = document.getElementById("example1-edit").innerHTML
+       , multi = MultiView('#example1')
+                   .mode('view', readTmpl, ReadView)
+                   .mode('edit', editTmpl, EditView)
+
+
+     var m = Model()
+
+    window.onload = function(){
+      multi.render(m,'view');
+    }
+
+   </script>
+  </body>
+</html>
