@@ -42,7 +42,7 @@
 
 ### MultiView#transitioned( className:String )
 
-  Element class name which is after when templates are swapped in; used
+  Element class name which is added after templates are swapped in; used
   for CSS transitions.
 
 ## Events
