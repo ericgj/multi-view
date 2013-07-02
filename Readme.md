@@ -2,8 +2,7 @@
 # multi-view
 
   Multiple-state views controller.  Lets you define multiple reactive
-  template/view pairs and easily transition between them from within your
-  views.
+  views and easily transition between them.
 
 ## Installation
 
@@ -16,7 +15,7 @@
   same place on the page. Also, you want to be able to transition between
   them based on user events within any of the views.
 
-  This library encapsulates that kind of behavior and provides and alternative
+  This library encapsulates that kind of behavior and provides an alternative
   to managing 'view mode' externally between two or more template/views.
 
   I put scare-quotes around _view mode_ because of course no one wants _modal
@@ -31,18 +30,18 @@
 
   Constructor; specify root element which templates are appended under.
 
-### MultiView#mode( name:String, template:String, view:Function )
+### MultiView#mode( name:String, view:Function )
 
-  Define mode with given name, reactive template (String), and view class
+  Define mode with given name and view class
 
 ### MultiView#render( model:Object, mode:String )
 
   Transition to given mode, building view with given model and swapping in
-  the built template.
+  the built element into the DOM.
 
 ### MultiView#transitioned( className:String )
 
-  Element class name which is added after templates are swapped in; used
+  Element class name which is added after elements are swapped in; used
   for CSS transitions.
 
 ## Events
@@ -56,6 +55,13 @@ Two events are emitted after mode transitions:
 
 ## Notes
 
+### Assumptions about Views
+
+  Your view constructors should take a single argument: the model.
+  The views themselves are responsible for setting and "reactifying" a 
+  template, etc. Any other state that your view needs should be set 
+  externally, not in the constructor.
+  
 ### How to transition between views from within your views
 
   Your handler should emit the name of the mode you want to transition to.

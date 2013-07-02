@@ -1,5 +1,4 @@
 var Emitter = require('emitter')
-  , domify  = require('domify')
   , classes = require('classes')
 
 module.exports = MultiView;
@@ -8,15 +7,13 @@ function MultiView(el){
   if (!(this instanceof MultiView)) return new MultiView(el);
   this.rootEl = (typeof el == 'string' ? document.querySelector(el) : el);
   this.views = {};
-  this.templates = {};
   this.transitionedClass = null;
   return this;
 }
 
 MultiView.prototype = new Emitter;
 
-MultiView.prototype.mode = function(name,tmpl,view){
-  this.templates[name] = tmpl;
+MultiView.prototype.mode = function(name,view){
   this.views[name] = view;
   return this;
 }
@@ -32,7 +29,7 @@ MultiView.prototype.render = function(model,mode){
     , lastEl   = this.el
   this.model = model;
   this.mode = mode;
-  this.view = new this.views[mode](domify(this.templates[mode]),model);
+  this.view = this._constructView(model,mode);
   this.el = this.view.el;
   this.bindTransitions();
   if (lastEl) { this.rootEl.replaceChild(this.el, lastEl) }
@@ -55,6 +52,11 @@ MultiView.prototype.bindTransitions = function(){
       self.render(self.model,mode);
     });
   });
+}
+
+MultiView.prototype._constructView = function(model,mode) {
+  var viewClass = this.views[mode]
+  return new viewClass(model);
 }
 
 // private

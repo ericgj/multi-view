@@ -43,7 +43,6 @@
       } 
 
       .read p {
-        width: 200px;
         margin: 1em 0.5em;
         display: inline-block;
       }
@@ -76,6 +75,7 @@
       var MultiView = require('multi-view')
         , Emitter = require('component-emitter')
         , reactive = require('component-reactive')
+        , domify   = require('component-domify')
 
       function Model(name){
         if (!(this instanceof Model)) return new Model(name);
@@ -88,10 +88,13 @@
 
      /* example 1 */
 
-     function ReadView(el,model){
+     var readTmpl = document.getElementById("example1-read").innerHTML
+       , editTmpl = document.getElementById("example1-edit").innerHTML
+
+     function ReadView(model){
        this.model = model;
-       this.el = el;
-       this.view = reactive(el,model,this);
+       this.el = domify(readTmpl);
+       this.view = reactive(this.el,model,this);
        return Emitter(this);
      }
 
@@ -99,10 +102,10 @@
        this.emit('edit');
      }
 
-     function EditView(el,model){
+     function EditView(model){
        this.model = model;
-       this.el = el;
-       this.view = reactive(el,model,this);
+       this.el = domify(editTmpl);
+       this.view = reactive(this.el,model,this);
        return Emitter(this);
      }
 
@@ -136,11 +139,9 @@
        }
      }
 
-     var readTmpl = document.getElementById("example1-read").innerHTML
-       , editTmpl = document.getElementById("example1-edit").innerHTML
-       , multi = MultiView('#example1')
-                   .mode('view', readTmpl, ReadView)
-                   .mode('edit', editTmpl, EditView)
+     var multi = MultiView('#example1')
+                   .mode('view', ReadView)
+                   .mode('edit', EditView)
                    .transitioned('trans');
 
      var m = Model()

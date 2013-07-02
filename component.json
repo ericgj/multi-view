@@ -2,14 +2,14 @@
   "name": "multi-view",
   "repo": "ericgj/multi-view",
   "description": "Multiple-state views controller",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "keywords": [],
   "dependencies": {
     "component/emitter": "*",
-    "component/domify": "*",
     "component/classes": "*"
   },
   "development": {
+    "component/domify": "*",
     "component/reactive": "*"  
   },
   "license": "MIT",
